@@ -16,17 +16,41 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install buildozer & dependencies
+      - name: Install system dependencies
         run: |
-          pip install buildozer
           sudo apt-get update
           sudo apt-get install -y \
             git zip unzip openjdk-17-jdk \
             python3-pip python3-setuptools \
-            libssl-dev libffi-dev
+            libssl-dev libffi-dev \
+            wget autoconf libtool
+
+      - name: Install Android SDK
+        run: |
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          cd $HOME/android-sdk/cmdline-tools
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip -q commandlinetools-linux-11076708_latest.zip
+          mv cmdline-tools latest
+          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
+          echo "$HOME/android-sdk/build-tools/34.0.0" >> $GITHUB_PATH
+          yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/android-sdk \
+            "platform-tools" \
+            "platforms;android-34" \
+            "build-tools;34.0.0" \
+            "ndk;27.0.12077973"
+
+      - name: Install buildozer
+        run: pip install buildozer Cython
 
       - name: Build APK
         run: buildozer android debug
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
+          ANDROID_NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/27.0.12077973
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

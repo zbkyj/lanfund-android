@@ -7,8 +7,6 @@ package.domain = org.lanfund.app
 source.dir = .
 source.include_exts = py,txt
 version = 1.0.0
-version.regex = __version__\s*=\s*['"](.*?)['"]
-version.filename = src/__init__.py
 
 # 依赖（纯 Python，交叉编译零障碍）
 requirements = python3,flask,requests

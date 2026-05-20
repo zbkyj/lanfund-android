@@ -42,14 +42,18 @@ jobs:
             "platforms;android-34" \
             "build-tools;34.0.0"
 
-      - name: Verify SDK installation
+      - name: Fix sdkmanager path for Buildozer
         run: |
-          echo "=== build-tools ==="
-          ls -la ~/.buildozer/android/platform/android-sdk/build-tools/34.0.0/ | head -5
+          SDK_DIR=~/.buildozer/android/platform/android-sdk
+          # Buildozer expects sdkmanager at $ANDROID_HOME/tools/bin/
+          # Modern Android SDK puts it at cmdline-tools/latest/bin/
+          ln -sfn $SDK_DIR/cmdline-tools/latest $SDK_DIR/tools
+          echo "=== SDK structure ==="
+          ls -la $SDK_DIR/
+          echo "=== sdkmanager ==="
+          find $SDK_DIR -name "sdkmanager" -type f 2>/dev/null
           echo "=== aidl ==="
-          find ~/.buildozer/android/platform/android-sdk/build-tools -name "aidl" 2>/dev/null
-          echo "=== ANDROID_HOME ==="
-          echo "$HOME/.buildozer/android/platform/android-sdk"
+          find $SDK_DIR -name "aidl" -type f 2>/dev/null
 
       - name: Build APK
         run: buildozer android debug

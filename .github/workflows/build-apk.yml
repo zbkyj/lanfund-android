@@ -23,8 +23,9 @@ jobs:
             git zip unzip openjdk-17-jdk \
             python3-pip python3-setuptools \
             libssl-dev libffi-dev \
-            wget autoconf libtool libtool-bin \
-            liblzma-dev tk-dev uuid-dev libreadline-dev
+            wget autoconf automake libtool libtool-bin \
+            liblzma-dev tk-dev uuid-dev libreadline-dev \
+            libgdbm-dev libdb-dev
 
       - name: Install buildozer
         run: pip install buildozer Cython

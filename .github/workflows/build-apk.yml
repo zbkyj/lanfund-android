@@ -57,11 +57,20 @@ jobs:
           echo "=== aidl ==="
           find $SDK_DIR -name "aidl" -type f 2>/dev/null
 
+      - name: Fix libtool macros for hostpython
+        run: |
+          # LT_SYS_SYMBOL_USCORE was removed in libtool 2.4.7+
+          # Python 3.11's configure.ac still uses it
+          echo 'AC_DEFUN([LT_SYS_SYMBOL_USCORE],[])' | sudo tee /usr/share/aclocal/libtool-compat.m4
+          echo "=== Verifying macro install ==="
+          aclocal --print-ac-dir
+          ls -la /usr/share/aclocal/libtool-compat.m4
+
       - name: Build APK
         run: buildozer android debug
         env:
-          ANDROID_HOME: ~/.buildozer/android/platform/android-sdk
-          ANDROID_SDK_ROOT: ~/.buildozer/android/platform/android-sdk
+          ANDROID_HOME: /home/runner/.buildozer/android/platform/android-sdk
+          ANDROID_SDK_ROOT: /home/runner/.buildozer/android/platform/android-sdk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
